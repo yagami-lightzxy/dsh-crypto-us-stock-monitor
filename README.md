@@ -1,6 +1,6 @@
 # 加密美股监控 · Crypto × US Stock Monitor
 
-DSH Desktop 左下角的加密 + 美股行情监控面板（v0.12.2，宽 560px）：自选行情、技术面、市场宽度、VIX/VXN/F&G 情绪与信号提醒。
+DSH Desktop 左下角的加密 + 美股行情监控面板（v0.13.0，宽 560px）：自选行情、技术面、市场宽度、VIX/VXN/F&G 情绪与信号提醒，并给 AI Agent 提供本地读写接口。
 
 > **免责声明**
 > 本项目仅用于行情监控与技术分析学习，**不是投资建议**，不承诺任何收益。面板里的「买入/关注/等待/回避」是规则化条件判断，不是荐股；历史回测显示「综合」预设长期跑输买入持有（见文末「回测说明」）。数据来自第三方公共接口，可能延迟、缺失或中断；据此交易的风险由使用者自行承担。
@@ -15,12 +15,48 @@ DSH Desktop 左下角的加密 + 美股行情监控面板（v0.12.2，宽 560px�
 - 本仓库无构建步骤、无第三方运行时依赖；`package.json` 的 `dsh.bundle.patch` 指向 `cordis.patch.yml`。
 - 将仓库放到本地任意目录，通过 DSH 的插件管理或配置以本地 `link` 方式加载；重启 DSH Desktop 后，左下角出现「加密美股监控」。
 - 已在 Windows + DSH Desktop 上验证；Host/Client 插件 API 可能随 DSH 版本变化，升级 DSH 后请重新跑一次自检。
-- 技术包名/id 仍为 `dsh-binance-bitget-watchlist`，用于兼容旧安装与路由；公开显示名是「加密美股监控」。
+- 技术包名/id 为 `dsh-crypto-us-stock-monitor`（0.13 起，与显示名一致），API 基址 `/plugins/dsh-crypto-us-stock-monitor/api`。
+- 从 0.12.x 升级：旧包名 `dsh-binance-bitget-watchlist` 的安装需要重新 link/安装一次；浏览器 localStorage 键保留旧前缀以迁移自选与目标价。
+
+## Agent 集成（0.13 新增）
+
+Agent 可以直接读取行情、列出/修改自选、设置目标价，不需要解析网页：
+
+```bash
+# 读取全部状态（自选 + 目标价 + revision）
+node bin/monitor.mjs --base http://127.0.0.1:8388 state
+
+# 多标的报价
+node bin/monitor.mjs --base http://127.0.0.1:8388 quotes BTCUSDT NVDA
+
+# 设置目标价（stock 加 --stock）
+node bin/monitor.mjs --base http://127.0.0.1:8388 target set NVDA 200 --stock --stop 170 --note "右侧确认"
+
+# 加自选
+node bin/monitor.mjs --base http://127.0.0.1:8388 watch add MSFT --stock
+```
+
+等价的 HTTP 接口：
+
+| 方法 | 路径 | 用途 |
+|---|---|---|
+| GET | `/api/state` | 自选 + 目标价 + revision |
+| PUT | `/api/state` | 批量替换自选/目标价 |
+| GET | `/api/watchlist` | 只读自选 |
+| POST | `/api/watchlist` | `{kind,symbol,action:"add"/"remove"}` |
+| GET | `/api/targets` | 目标价 map |
+| PUT/POST | `/api/targets` | `{kind,symbol,price,direction,stop,note}` |
+| DELETE | `/api/targets?symbol=NVDA&kind=stock` | 清除目标价 |
+
+- 状态文件：`~/.dsh/storages/dsh-crypto-us-stock-monitor/state.json`
+- 面板每 20 秒同步；Agent 设置后，用户刷新面板或等 20 秒即可看到。
+- 详细给 Agent 的说明见 [AGENTS.md](AGENTS.md)。
+- 写接口只改本地 JSON，不交易、不接券商。
 
 ## 隐私
 
 - 不需要 API Key；不收集、不上传自选列表或使用数据。
-- 自选、预设、提醒、目标价只存在浏览器 `localStorage`。
+- 自选、预设、提醒、目标价存在浏览器 `localStorage`；自选与目标价同时镜像到本机 `~/.dsh/storages/dsh-crypto-us-stock-monitor/state.json`，供 Agent 读写。
 - 行情请求由本机直接发往 Binance / Bitget / Yahoo / OKX / Alternative.me 的公共接口，受各站条款与速率限制约束。
 
 ## 回测说明（重要）
@@ -37,7 +73,7 @@ DSH Desktop 左下角的加密 + 美股行情监控面板（v0.12.2，宽 560px�
 
 结论：它是**降低波动的时间过滤**，不是长期 alpha；不要把它当独立全仓策略。回测有幸存者偏差、未计滑点/税，样本仅 5 个近期强势标的。
 
-## 仪表盘怎么读（新增 0.8.0）
+## 功能概览
 
 - 只读公共行情，不需要 API Key。
 - 加密行情双源：Binance 24h ticker + Bitget v3 SPOT ticker；任一源失败不影响另一源。
@@ -49,7 +85,7 @@ DSH Desktop 左下角的加密 + 美股行情监控面板（v0.12.2，宽 560px�
 - 每个标的的完整技术面板：趋势、KDJ、CCI、Williams %R、ADX/DMI、MACD（含柱变化/金叉死叉）、BOLL（含带宽分位）、ATR（分位）、量比/量能趋势、OBV 斜率、20 日突破/跌破、60 日高低距离、RSI 背离、K 线形态、均线排列/斜率。
 - 每个标的给出预设条件清单（✅/❌ + 数值）、买入/关注/等待/回避、入场/止损/目标/盈亏比。
 
-## 仪表盘怎么读（新增 0.8.0）
+## 仪表盘怎么读（0.8.0）
 
 每个仪表不再只给数字，而是直接给「状态 + 该做什么」：
 
@@ -104,7 +140,17 @@ DSH Desktop 左下角的加密 + 美股行情监控面板（v0.12.2，宽 560px�
 
 ## 接口
 
-基址：`/plugins/dsh-binance-bitget-watchlist/api`
+基址：`/plugins/dsh-crypto-us-stock-monitor/api`
+
+### Agent 状态接口
+
+- `GET /state`：`{ ok, initialized, revision, updatedAt, watchlist:{crypto,stocks}, targets }`
+- `PUT /state`：`{ watchlist?, targets? }`；用于批量替换。
+- `POST /watchlist`：`{ kind:"crypto"|"stock", symbol, action:"add"|"remove" }`
+- `PUT /targets`：`{ kind, symbol, price, direction:"above"|"below", stop?, note? }`
+- `DELETE /targets?symbol=NVDA&kind=stock`
+- 目标价 key：`crypto:BTCUSDT` / `stock:NVDA`；`price` 为目标价，`stop` 为可选止损。
+- 状态写入 `~/.dsh/storages/dsh-crypto-us-stock-monitor/state.json`；不交易、不接券商。
 
 ### GET `/quotes`
 
@@ -222,4 +268,5 @@ A DSH Desktop plugin for crypto + US stock market monitoring: watchlist quotes f
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
 

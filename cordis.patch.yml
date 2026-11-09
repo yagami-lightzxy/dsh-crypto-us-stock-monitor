@@ -1,3 +1,4 @@
 - insert:
-    - id: dsh-binance-bitget-watchlist
-      name: 'dsh-binance-bitget-watchlist'
+    - id: dsh-crypto-us-stock-monitor
+      name: 'dsh-crypto-us-stock-monitor'
+
