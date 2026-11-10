@@ -1,27 +1,27 @@
 # AGENTS.md · 加密美股监控
 
-此文件给 AI Agent 读取。插件运行在 DSH Desktop 内，行情 API 是只读的；**自选与目标价写操作也只改本地 JSON，不会下单**。
+供 AI Agent 调用插件时查阅。插件运行在 DSH Desktop 中，可读取行情，并在本地保存自选和目标价。
 
 ## 快速读取
 
 ```bash
-# 基址：DSH Web GUI 地址（当前会话见运行上下文，例如 http://127.0.0.1:8388）
+# 基址填写当前 DSH Web GUI 地址，以下以 http://127.0.0.1:8388 为例
 export DSH_BASE_URL=http://127.0.0.1:8388
 
-# 全部自选 + 目标价 + revision
+# 读取自选、目标价和状态版本号
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/state"
 
-# 多标的报价（加密用 xxxUSDT，美股用 ticker）
+# 读取多个标的报价（加密使用 BTCUSDT 这类交易对，美股使用股票代码）
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/quotes?symbols=BTCUSDT&stocks=NVDA,AAPL"
 
-# 市场宽度/情绪
+# 读取市场宽度和情绪指标
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/market"
 
-# 搜索
+# 搜索标的
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/search?q=nvda"
 ```
 
-或直接用 CLI（无需依赖）：
+也可以使用 CLI。需要 Node.js 18 或更高版本，且 DSH Desktop 和插件已启动；基址通过 `--base` 或环境变量 `DSH_BASE_URL` 指定，默认 `http://127.0.0.1:8388`。
 
 ```bash
 node bin/monitor.mjs state
@@ -31,10 +31,10 @@ node bin/monitor.mjs target set NVDA 200 --stock --stop 170 --note "突破后目
 node bin/monitor.mjs target clear NVDA --stock
 ```
 
-## 写目标价 / 自选
+## 设置目标价与管理自选
 
 ```bash
-# 设置目标价（direction: above / below；stop/note 可选）
+# 设置目标价（direction 为 above 或 below；stop、note 可选）
 curl -s -X PUT "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/targets" \
   -H 'Content-Type: application/json' \
   -d '{"kind":"stock","symbol":"NVDA","price":200,"direction":"above","stop":170,"note":"右侧确认"}'
@@ -42,28 +42,28 @@ curl -s -X PUT "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/targets" \
 # 删除目标价
 curl -s -X DELETE "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/targets?symbol=NVDA&kind=stock"
 
-# 加/删自选
+# 添加自选（action 改为 remove 可移除）
 curl -s -X POST "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/watchlist" \
   -H 'Content-Type: application/json' \
   -d '{"kind":"stock","symbol":"MSFT","action":"add"}'
 
-# 批量替换状态（谨慎；会覆盖自选与目标价）
+# 批量替换自选和目标价（此示例会将目标价清空为 {}）
 curl -s -X PUT "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/state" \
   -H 'Content-Type: application/json' \
   -d '{"watchlist":{"crypto":["BTCUSDT"],"stocks":["NVDA"]},"targets":{}}'
 ```
 
-面板每 20 秒同步一次服务端状态；Agent 改完目标价后，用户在面板里最多等 20 秒，或点一次刷新。
+面板每 20 秒同步一次服务端状态。Agent 修改后，可等待自动同步，也可手动刷新面板。
 
 ## 状态文件
 
 - `~/.dsh/storages/dsh-crypto-us-stock-monitor/state.json`
 - 字段：`revision`、`updatedAt`、`watchlist`、`targets`
-- 目标价 key：`crypto:BTCUSDT` / `stock:NVDA`
+- 目标价键名：`crypto:BTCUSDT` / `stock:NVDA`
 
-## 约束
+## 操作约定
 
-- 仅本地接口，无鉴权；不要把端口暴露到公网。
-- 接口不会交易、不会连接券商；目标价只是提醒。
-- 数据来自第三方公共接口，可能延迟/失败；交易决策前自行核实。
-- 修改自选/目标价会影响用户面板，执行前确认用户意图。
+- 接口用于本机访问，未设置鉴权；端口应保持在本地访问范围。
+- 写入范围为面板的自选和目标价设置；目标价用于提醒，接口不执行交易。
+- 行情来自第三方公共接口。用于交易决策前，核对数据时间和请求状态。
+- 按用户已授权的范围修改自选和目标价；范围不清时先确认。批量替换前核对待覆盖内容。
