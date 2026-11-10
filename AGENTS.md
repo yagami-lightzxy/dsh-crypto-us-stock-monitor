@@ -21,6 +21,7 @@ curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/market"
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/search?q=nvda"
 
 # 迷你走势序列（面板用它画 60 日走势，复用日线缓存）
+# 返回 { closes, times }，times 为毫秒时间戳
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/series?symbols=BTCUSDT&stocks=NVDA&limit=80"
 ```
 
