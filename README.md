@@ -19,7 +19,7 @@
 2. 通过 DSH 的插件管理或配置，以本地 `link` 方式加载该目录。
 3. 重启 DSH Desktop，左侧图标列（插件 / 浏览器 / 学习那一列）会出现「加密美股监控」图标；点击后在中央面板打开。
 
-当前版本为 **0.15.0**，已在 Windows + DSH Desktop 上验证。升级 DSH 后，可检查侧栏图标、中央面板加载、行情刷新和目标价同步是否正常。
+当前版本为 **0.15.0**。界面已重设计，重启 DSH 后按下方步骤验证实际加载与行情刷新。升级 DSH 后，可检查侧栏图标、中央面板加载、行情刷新和目标价同步是否正常。
 
 包名与插件 ID：`dsh-crypto-us-stock-monitor`。`package.json` 中的 `dsh.bundle.patch` 指向 `cordis.patch.yml`。
 
@@ -282,6 +282,7 @@ Requires DSH Desktop and Node.js 18 or later. Uses public market data without AP
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
 
 
 
