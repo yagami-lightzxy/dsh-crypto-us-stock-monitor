@@ -4,6 +4,13 @@
 
 > 界面截图：左侧图标 + 中央面板（重启 DSH 后可直接查看；`docs/panel.png` 是旧悬浮版存档，不再代表当前交互）。
 
+## 0.15 界面与显示内容
+
+- **左侧图标栏**：与「插件 / 浏览器 / 学习」同一列；图标右下角显示 BTCUSDT 24h 涨跌幅，每 8 秒刷新；悬停提示显示自选前 5 个加密 + 前 5 个美股 + VIX。
+- **中央面板**：顶部 4 个概览卡（加密宽度、美股宽度、VIX、加密 F&G）；左侧自选列表（价格、24h 涨跌、技术面标签、目标价入口）；右侧单标的技术面与目标价编辑；底部 VIX/VXN/F&G 历史分布。
+- 点自选行查看详情；搜索框可直接添加加密或美股；× 移除自选；目标价支持上破/下破与止损。
+- 技术面标签是 RSI、MACD、ADX、均线、趋势的规则化摘要，不是投资建议，也不等同于旧版 7 套预设的回测信号。
+
 ## 安装与兼容
 
 插件运行在 **DSH Desktop** 中，需要宿主支持 Cordis 插件和 `dsh.bundle.patch`。仓库可直接加载，无需构建或安装第三方运行时依赖。
@@ -12,7 +19,7 @@
 2. 通过 DSH 的插件管理或配置，以本地 `link` 方式加载该目录。
 3. 重启 DSH Desktop，左侧图标列（插件 / 浏览器 / 学习那一列）会出现「加密美股监控」图标；点击后在中央面板打开。
 
-当前版本为 **0.14.1**，已在 Windows + DSH Desktop 上验证。升级 DSH 后，可检查侧栏图标、中央面板加载、行情刷新和目标价同步是否正常。
+当前版本为 **0.15.0**，已在 Windows + DSH Desktop 上验证。升级 DSH 后，可检查侧栏图标、中央面板加载、行情刷新和目标价同步是否正常。
 
 包名与插件 ID：`dsh-crypto-us-stock-monitor`。`package.json` 中的 `dsh.bundle.patch` 指向 `cordis.patch.yml`。
 
@@ -275,6 +282,7 @@ Requires DSH Desktop and Node.js 18 or later. Uses public market data without AP
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
 
 
 
