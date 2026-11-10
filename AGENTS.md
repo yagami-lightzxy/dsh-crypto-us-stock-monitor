@@ -23,6 +23,9 @@ curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/search?q=nvda"
 # 迷你走势序列（面板用它画 60 日走势，复用日线缓存）
 # 返回 { closes, times }，times 为毫秒时间戳
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/series?symbols=BTCUSDT&stocks=NVDA&limit=80"
+
+# 全市场扫描（加密按成交额取前 120 对，美股 84 只活跃标的；结果缓存 5 分钟）
+curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/scan?crypto=120&stocks=60"
 ```
 
 也可以使用 CLI。需要 Node.js 18 或更高版本，且 DSH Desktop 和插件已启动；基址通过 `--base` 或环境变量 `DSH_BASE_URL` 指定，默认 `http://127.0.0.1:8388`。
