@@ -1,6 +1,6 @@
 {
   "name": "dsh-crypto-us-stock-monitor",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "DSH Desktop 加密货币与美股监控插件：顶部大盘行情条、自选与技术指标、市场情绪与分布、信号提醒，以及 Agent 自选与目标价管理",
   "type": "module",
   "main": "./lib/index.js",

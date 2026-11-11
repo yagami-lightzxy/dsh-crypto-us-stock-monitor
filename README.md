@@ -4,6 +4,23 @@
 
 > 界面截图见 `docs/panel.png`、`docs/scan.png`、`docs/table.png`、`docs/mood.png`（重启 DSH 后在左侧图标列打开）。
 
+## 0.21 合约价 / 现货价与动效
+
+## 价格口径
+
+- **主价格 = 合约价**：Bitget USDT-M 永续（`/api/v2/mix/market/tickers`）。Binance 合约接口在本机被地区限制，所以合约参考用 Bitget。
+- **副价格 = 现货价**：Binance 现货（`data-api.binance.vision`）；Bitget 现货作兜底。
+- 自选行：主价格下方一行小字 `现货 76,185.11`；详情页显示 `现货 … · 基差 -0.060%`。
+- 接口返回新增 `contractPrice` / `contractChangePct` / `spotPrice` / `spotChangePct` / `priceSource`，`price` 字段现在等于合约价。
+- K 线与技术指标仍用 Binance 现货日线计算（两者基差通常在 0.1% 以内），信号不受影响。
+
+## 动效
+
+- 价格变动时数字底色闪一下（涨绿跌红），观察 5 秒轮询的变化更直观。
+- 状态圆点脉冲扩散、迷你走势描线动画、顶部行情条缓慢扫光。
+- 卡片悬停轻微上浮，信号「买入」标签呼吸式高亮。
+- 全部动效遵守 `prefers-reduced-motion`，系统关闭动画时自动停用。
+
 ## 0.20 默认信号：RSI2 抄底
 
 默认卖掉「综合」那套趋势信号，换成均值回归的 RSI2 抄底，规则只有两条：
@@ -56,7 +73,7 @@
 2. 通过 DSH 的插件管理或配置，以本地 `link` 方式加载该目录。
 3. 重启 DSH Desktop，左侧图标列（插件 / 浏览器 / 学习那一列）会出现「加密美股监控」图标；点击后在中央面板打开。
 
-当前版本为 **0.20.0**。界面已完整重构（顶部大盘行情条 + 看板/扫描/盘面/信号/设置五个页签），默认信号是胜率与收益兼顾的「RSI2 抄底」（72.4% 胜率），重启 DSH 后即可看到。
+当前版本为 **0.21.0**。加密价格主显合约价（Bitget USDT-M 永续），同一行小字附现货价（Binance 现货）与基差；界面加入价格跳动、脉冲、扫光等动效。
 
 包名与插件 ID：`dsh-crypto-us-stock-monitor`。`package.json` 中的 `dsh.bundle.patch` 指向 `cordis.patch.yml`。
 
