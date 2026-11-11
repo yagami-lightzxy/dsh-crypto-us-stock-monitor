@@ -24,7 +24,7 @@ curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/search?q=nvda"
 # 返回 { closes, times }，times 为毫秒时间戳
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/series?symbols=BTCUSDT&stocks=NVDA&limit=80"
 
-# ta 里除常规字段外还带 rsi2（2 周期 RSI）与 ma200（200 日均线），默认预设「RSI2 抄底」依赖这两个字段
+# ta 里除常规字段外还带 rsi2（2 周期 RSI）与 ma200（200 日均线），默认预设「RSI2 抄底」依赖这两个字段（RSI(2) ≤ 15 且价格 > MA200 即买入）
 # 全市场扫描（加密按成交额取前 120 对，美股 84 只活跃标的；结果缓存 5 分钟）
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/scan?crypto=120&stocks=60"
 ```
