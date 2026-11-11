@@ -24,6 +24,9 @@ curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/search?q=nvda"
 # 返回 { closes, times }，times 为毫秒时间戳
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/series?symbols=BTCUSDT&stocks=NVDA&limit=80"
 
+# 单标的衍生品快照：资金费率、持仓量、合约/现货价与基差
+curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/derivative?symbol=BTCUSDT"
+
 # 加密报价的主价格 price 是合约价（Bitget USDT-M），spotPrice 是 Binance 现货，合约与现货基差可据此算
 # ta 里除常规字段外还带 rsi2（2 周期 RSI）与 ma200（200 日均线），默认预设「RSI2 抄底」依赖这两个字段（RSI(2) ≤ 15 且价格 > MA200 即买入）
 # 全市场扫描（加密按成交额取前 120 对，美股 84 只活跃标的；结果缓存 5 分钟）
