@@ -24,6 +24,12 @@ curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/search?q=nvda"
 # 返回 { closes, times }，times 为毫秒时间戳
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/series?symbols=BTCUSDT&stocks=NVDA&limit=80"
 
+# 聪明钱：带单员搜索 / 持仓 / 历史（走币安网页接口，需要能访问 www.binance.com）
+curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/smart-money?action=search&q=熬鹰资本"
+curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/smart-money?ids=5075281354358777856"
+
+# 前端分段：p1 p2 p3a p3b p4a p4b p4c p6 p5（p6 是聪明钱页，必须在 p5 之前拼接）
+
 # 单标的衍生品快照：资金费率、持仓量、合约/现货价与基差
 curl -s "$DSH_BASE_URL/plugins/dsh-crypto-us-stock-monitor/api/derivative?symbol=BTCUSDT"
 

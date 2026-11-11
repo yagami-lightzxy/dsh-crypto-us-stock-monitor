@@ -4,6 +4,37 @@
 
 > 界面截图见 `docs/panel.png`、`docs/scan.png`、`docs/table.png`、`docs/mood.png`（重启 DSH 后在左侧图标列打开）。
 
+## 0.23 聪明钱 · 带单员
+
+新页签「聪明钱」，第一个区块是「带单员」：把你关注的币安跟单带单员放在一起，每 20 秒刷新。
+
+## 数据来源
+
+币安官方 API 没有带单员持仓接口（只有 `userStatus` / `leadSymbol` 两个账户级接口），所以这里走的是**币安网页版自己的接口**：
+
+| 用途 | 接口 |
+| --- | --- |
+| 昵称搜索 | `POST /bapi/futures/v1/friendly/future/copy-trade/home-page/query-list` |
+| 当前持仓 | `GET /bapi/futures/v1/friendly/future/copy-trade/lead-data/positions?portfolioId=` |
+| 已平仓 | `POST /bapi/futures/v1/friendly/future/copy-trade/lead-portfolio/position-history` |
+| 带单员信息 | `GET /bapi/futures/v1/friendly/future/copy-trade/lead-portfolio/detail?portfolioId=` |
+
+这些不是公开文档 API，币安改版就可能失效；服务端做了 20 秒缓存与失败降级，单个带单员拉取失败不会影响其他人。
+
+## 页面内容
+
+- 顶部汇总：关注人数、当前持仓笔数、合计名义价值、平均胜率、更新时间。
+- 每个带单员一张卡：当前持仓（币种 / 多空 / 杠杆 / 数量 / 开仓价 / 浮盈亏），空仓时明确显示「当前空仓」。
+- 战绩：近 100 笔胜率、场均盈亏、平均持仓时长、跟单人数。
+- 最近平仓：带盈亏着色的标签，点「在币安查看」可跳转带单员主页。
+- 搜索昵称即可关注，卡片右上角可取消关注，列表存在本地。
+
+## 注意
+
+- 带单员全空仓是常态，卡片会显示空仓状态而不是空白。
+- 持仓接口会返回该带单员所有交易对的记录，服务端已过滤掉数量为 0 的占位行。
+- 默认关注三位：trader Yy、电鱼哥实盘、熬鹰资本（昵称已解析成 ID 写死，可在界面里增删）。
+
 ## 0.22 交互与数据升级
 
 ## 新增交互
@@ -96,7 +127,7 @@
 2. 通过 DSH 的插件管理或配置，以本地 `link` 方式加载该目录。
 3. 重启 DSH Desktop，左侧图标列（插件 / 浏览器 / 学习那一列）会出现「加密美股监控」图标；点击后在中央面板打开。
 
-当前版本为 **0.22.0**。加密价格主显合约价、可一键切现货并显示基差；走势支持区间切换与双击设目标价；详情新增资金费率、持仓量、52 周高低等数据；自选支持键盘上下切换。
+当前版本为 **0.23.0**。新增「聪明钱」页签，第一个区块「带单员」实时汇总你关注的币安带单员持仓、战绩与最近平仓；搜索昵称即可添加，默认预置 trader Yy、电鱼哥实盘、熬鹰资本。
 
 包名与插件 ID：`dsh-crypto-us-stock-monitor`。`package.json` 中的 `dsh.bundle.patch` 指向 `cordis.patch.yml`。
 
